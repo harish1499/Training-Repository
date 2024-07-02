@@ -14,14 +14,14 @@
  *
  * Author : Jobin and Jismi IT Services
  * 
- * Date Created : 27-July-2024
+ * Date Created : 27-June-2024
  * 
  * Description : This script is for sending a remainder E-mail notification to the customers who are having the invoice overdue
  *               till previous month with the CSV File attachment containing the customer information and the overdue invoice details. 
  * 
  * REVISION HISTORY
  * 
- * @version 1.0 OTP-7402 : 27-July-2024 Created the initial built by JJ0333
+ * @version 1.0 OTP-7402 : 27-June-2024 Created the initial built by JJ0333
  * @version 1.1
  * 
  * 

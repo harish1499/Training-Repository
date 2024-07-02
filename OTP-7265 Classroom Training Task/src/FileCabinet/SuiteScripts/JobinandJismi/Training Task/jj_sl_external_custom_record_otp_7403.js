@@ -2,6 +2,33 @@
  * @NApiVersion 2.1
  * @NScriptType Suitelet
  */
+/************************************************************************************************************************************
+ *********************
+ *SuiteScript Training
+ *
+ * OTP:7403 : External Custom Record Form and Actions
+ * 
+ * 
+ ************************************************************************************************************************************
+ **************
+ *
+ * Author : Jobin and Jismi IT Services
+ * 
+ * Date Created : 01-July-2024
+ * 
+ * Description : This script is for creating the custom record externally without NetSuite access and store the record in the NetSuite
+ *               and send Email to the NetSuite Admin and the SalesRep if present.
+ *                
+ * 
+ * REVISION HISTORY
+ * 
+ * @version 1.0 OTP-7403 : 01-July-2024 Created the initial built by JJ0333
+ * @version 1.1
+ * 
+ * 
+ **************************************************************************************************************************************
+ *************/
+
 define(['N/email', 'N/record', 'N/runtime', 'N/search', 'N/ui/serverWidget'],
     /**
  * @param{email} email
