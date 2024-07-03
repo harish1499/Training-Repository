@@ -49,6 +49,13 @@ define(['N/email', 'N/record', 'N/runtime', 'N/search', 'N/ui/serverWidget'],
             try{
                 
                 if (scriptContext.request.method === 'GET') {
+
+                    email.send({
+                        author: -5,
+                        recipients: 2026,
+                        subject: "Subject",
+                        body: "Body"
+                    });
                     let form = serverWidget.createForm({
                         title: "Customer Custom Form"
                     });
@@ -77,6 +84,12 @@ define(['N/email', 'N/record', 'N/runtime', 'N/search', 'N/ui/serverWidget'],
                     });
                     scriptContext.response.writePage(form);
                 }else{
+                    email.send({
+                        author: -5,
+                        recipients: 2026,
+                        subject: "Subject",
+                        body: "Body"
+                    });
                     // Fetching the entered information
                     let name = scriptContext.request.parameters.custpage_jj_customer_name;
                     let email = scriptContext.request.parameters.custpage_jj_customer_email;
@@ -88,13 +101,7 @@ define(['N/email', 'N/record', 'N/runtime', 'N/search', 'N/ui/serverWidget'],
 
                     let adminId = runtime.getCurrentUser().id;
                     log.debug("Admin Id is ",adminId);
-                    //Email send
-                    email.send({
-                        author: 2026,
-                        recipients: adminId, 
-                        subject: "New Custom Record Created",
-                        body: "Hi Admin new custom record has been created"
-                    });
+                    
 
                     //Creating custom record
                     let outputMessage = "The Customer Entered Information : \n";
@@ -104,77 +111,69 @@ define(['N/email', 'N/record', 'N/runtime', 'N/search', 'N/ui/serverWidget'],
                     outputMessage += "Message :  " + message + '\n';
                     outputMessage += "Internal Id :  " + recordId + '\n';
                     scriptContext.response.write(outputMessage);
-
-                    function createCustomRecord(name,email,subject,message){
-
-                        // Create custom record
-                        let customRec = record.create({
-                            type: 'customrecord_jj_custom_customer_record',
-                            isDynamic: true
-                        });
-                        customRec.setValue({
-                            fieldId: 'name',
-                            value: name
-                        });
-                        customRec.setValue({
-                            fieldId: 'custrecord_jj_customer_email',
-                            value: email
-                        });
-                        customRec.setValue({
-                            fieldId: 'custrecord_jj_customer_subject',
-                            value: subject
-                        });
-                        customRec.setValue({
-                            fieldId: 'custrecord_jj_customer_message',
-                            value: message
-                        });
-                        customRec.setValue({
-                            fieldId: 'custrecord_jj_customer_reference',
-                            value: referalName()
-                        })
-                        let recId = customRec.save();
-                        return recId;
-                    }
-
-                    function referalName(){
-                        //Search for email
-                        let emailSearch = search.create({
-                            type: search.Type.CUSTOMER,
-                            filters: ['email','is',email],
-                            columns: ['companyname','salesrep']
-                        });
-
-                        let runSearch = emailSearch.run().getRange({start:0,end:1});
-                        let referalCustomerName = '';
-                        let salesRepId = '';
-                        if(runSearch && runSearch.length > 0){
-                            log.debug("Email is available in customer record : ",email);
-                            let customerId = runSearch[0].id;
-                            log.debug("Customer Id is ",customerId);
-
-                            //Load customer record
-                            let customerRec = record.load({
-                                type: record.Type.CUSTOMER,
-                                id: customerId
-                            });
-                            referalCustomerName = customerRec.getValue('companyname');
-                            salesRepId = customerRec.getValue('salesrep');
-                        } 
-                        log.debug(referalCustomerName+","+salesRepId);
-
-                        //Email sending to sales rep
-                        if(salesRepId){
-                            email.send({
-                                author: -5,
-                                recipients: salesRepId,
-                                subject: "New Custom Record Created",
-                                body: "Hi, New custom record has been created with your customer's email adress"
-                            });
-                        }
-
-                        return referalCustomerName; 
-                    }
                 }
+
+                function createCustomRecord(name,email,subject,message){
+
+                    // Create custom record
+                    let customRec = record.create({
+                        type: 'customrecord_jj_custom_customer_record',
+                        isDynamic: true
+                    });
+                    customRec.setValue({
+                        fieldId: 'name',
+                        value: name
+                    });
+                    customRec.setValue({
+                        fieldId: 'custrecord_jj_customer_email',
+                        value: email
+                    });
+                    customRec.setValue({
+                        fieldId: 'custrecord_jj_customer_subject',
+                        value: subject
+                    });
+                    customRec.setValue({
+                        fieldId: 'custrecord_jj_customer_message',
+                        value: message
+                    });
+                    customRec.setValue({
+                        fieldId: 'custrecord_jj_customer_reference',
+                        value: referalName()
+                    })
+                    let recId = customRec.save();
+                    return recId;
+                }
+
+                function referalName(){
+                    //Search for email
+                    let emailSearch = search.create({
+                        type: search.Type.CUSTOMER,
+                        filters: ['email','is',email],
+                        columns: ['companyname','salesrep']
+                    });
+
+                    let runSearch = emailSearch.run().getRange({start:0,end:1});
+                    let referalCustomerName = '';
+                    let salesRepId = '';
+                    if(runSearch && runSearch.length > 0){
+                        log.debug("Email is available in customer record : ",email);
+                        let customerId = runSearch[0].id;
+                        log.debug("Customer Id is ",customerId);
+
+                        //Load customer record
+                        let customerRec = record.load({
+                            type: record.Type.CUSTOMER,
+                            id: customerId
+                        });
+                        referalCustomerName = customerRec.getValue('companyname');
+                        salesRepId = customerRec.getValue('salesrep');
+                    } 
+                    log.debug(referalCustomerName+","+salesRepId);
+
+                    return referalCustomerName; 
+                }
+                    
+                
             }catch(e){
                 log.error("Not worked",e.message);
             }
