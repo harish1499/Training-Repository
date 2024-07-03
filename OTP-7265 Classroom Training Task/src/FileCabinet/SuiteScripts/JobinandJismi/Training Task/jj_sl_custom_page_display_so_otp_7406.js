@@ -2,6 +2,32 @@
  * @NApiVersion 2.1
  * @NScriptType Suitelet
  */
+/************************************************************************************************************************************
+ *********************
+ *SuiteScript Training
+ *
+ * OTP:7406 : Custom page for display sales order based on status
+ * 
+ * 
+ ************************************************************************************************************************************
+ **************
+ *
+ * Author : Jobin and Jismi IT Services
+ * 
+ * Date Created : 02-July-2024
+ * 
+ * Description : This script describs the process of creating the custom form to display sales orders details, which need to be fulfilled or
+                 billed, and the filter applies to display the records.. 
+ * 
+ * REVISION HISTORY
+ * 
+ * @version 1.0 OTP-7406 : 02-July-2024 Created the initial built by JJ0333
+ * @version 1.1
+ * 
+ * 
+ **************************************************************************************************************************************
+ *************/
+
 define(['N/search', 'N/ui/serverWidget'],
 
     function(search, serverWidget) {
@@ -331,7 +357,7 @@ define(['N/search', 'N/ui/serverWidget'],
                         columns: columns
                     });
     
-                    let searchResults = salesOrderSearch.run().getRange({ start: 0, end: 6 }); // Limiting to 100 results for example
+                    let searchResults = salesOrderSearch.run().getRange({ start: 0, end: 3 }); // Limiting to 100 results for example
     
                     // Add search results to the sublist
                     for (let i = 0; i < searchResults.length; i++) {
