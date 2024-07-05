@@ -60,30 +60,3 @@ function(record) {
     };
     
 });
-/**
- * @NApiVersion 2.x
- * @NScriptType ScheduledScript
- */
-
-define(['N/search'], function(search) {
-
-    function deleteSavedSearch() {
-        var savedSearchId = 'customsearch_my_saved_search'; // Replace with your saved search ID
-        
-        try {
-            // Delete the saved search
-            search.delete({
-                id: 89
-            });
-
-            log.audit('Success', 'Saved search deleted successfully');
-        } catch (e) {
-            log.error('Error', 'Error deleting saved search: ' + e.message);
-        }
-    }
-
-    return {
-        execute: deleteSavedSearch
-    };
-
-});
