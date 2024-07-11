@@ -2,12 +2,13 @@
  * @NApiVersion 2.1
  * @NScriptType Restlet
  */
-define(['N/record','N/render'],
+define(['N/record','N/render', 'N/file'],
     /**
  * @param{record} record
  * @param{render} render
+ * @param{file} file
  */
-    (record, render) => {
+    (record, render, file) => {
         /**
          * Defines the function that is executed when a GET request is sent to a RESTlet.
          * @param {Object} requestParams - Parameters from HTTP request URL; parameters passed as an Object (for all supported
@@ -25,6 +26,23 @@ define(['N/record','N/render'],
                 entityId : recordId,
                 printMode : render.PrintMode.PDF
             });
+
+            // let fileTemplate = file.load({id: documentNumber})
+            // Create PDF
+            // let render = render.create();
+            // render.templateContent = templateFile.getContents();
+            // render.addRecord('record', customRecord);
+
+            // let pdfFile = render.renderAsPdf();
+            // pdfFile.name = 'CustomRecord_' + recordId + '.pdf';
+            // pdfFile.folder = 613;
+            // let pdfFileId = pdfFile.save();
+
+            // // Create the URL for the PDF file
+            // let pdfUrl = url.resolveRecord({
+            //     recordType: 'file',
+            //     recordId: pdfFileId,
+            // });
 
             log.debug("PDF attachment",recordPdf);
             return recordPdf;
