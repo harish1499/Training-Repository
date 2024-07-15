@@ -49,13 +49,6 @@ define(['N/email', 'N/record', 'N/runtime', 'N/search', 'N/ui/serverWidget'],
             try{
                 
                 if (scriptContext.request.method === 'GET') {
-
-                    email.send({
-                        author: -5,
-                        recipients: 2026,
-                        subject: "Subject",
-                        body: "Body"
-                    });
                     let form = serverWidget.createForm({
                         title: "Customer Custom Form"
                     });
@@ -84,12 +77,6 @@ define(['N/email', 'N/record', 'N/runtime', 'N/search', 'N/ui/serverWidget'],
                     });
                     scriptContext.response.writePage(form);
                 }else{
-                    email.send({
-                        author: -5,
-                        recipients: 2026,
-                        subject: "Subject",
-                        body: "Body"
-                    });
                     // Fetching the entered information
                     let name = scriptContext.request.parameters.custpage_jj_customer_name;
                     let email = scriptContext.request.parameters.custpage_jj_customer_email;
@@ -101,7 +88,10 @@ define(['N/email', 'N/record', 'N/runtime', 'N/search', 'N/ui/serverWidget'],
 
                     let adminId = runtime.getCurrentUser().id;
                     log.debug("Admin Id is ",adminId);
-                    
+
+                    if(recordId){
+                        sendEmailToAdmin(adminId);
+                    }
 
                     //Creating custom record
                     let outputMessage = "The Customer Entered Information : \n";
@@ -138,42 +128,37 @@ define(['N/email', 'N/record', 'N/runtime', 'N/search', 'N/ui/serverWidget'],
                     });
                     customRec.setValue({
                         fieldId: 'custrecord_jj_customer_reference',
-                        value: referalName()
+                        value: referalName(email)
                     })
                     let recId = customRec.save();
                     return recId;
                 }
 
-                function referalName(){
+                function referalName(email){
                     //Search for email
                     let emailSearch = search.create({
                         type: search.Type.CUSTOMER,
                         filters: ['email','is',email],
-                        columns: ['companyname','salesrep']
+                        columns: ['internalid','salesrep']
                     });
 
                     let runSearch = emailSearch.run().getRange({start:0,end:1});
-                    let referalCustomerName = '';
-                    let salesRepId = '';
                     if(runSearch && runSearch.length > 0){
                         log.debug("Email is available in customer record : ",email);
-                        let customerId = runSearch[0].id;
-                        log.debug("Customer Id is ",customerId);
-
-                        //Load customer record
-                        let customerRec = record.load({
-                            type: record.Type.CUSTOMER,
-                            id: customerId
-                        });
-                        referalCustomerName = customerRec.getValue('companyname');
-                        salesRepId = customerRec.getValue('salesrep');
+                        let customerId = runSearch[0].getValue('internalid');
+                        log.debug("Customer Id is: ",customerId);
+                        return customerId; 
                     } 
-                    log.debug(referalCustomerName+","+salesRepId);
-
-                    return referalCustomerName; 
+                }
+                function sendEmailToAdmin(adminId){
+                    email.send({
+                        author: 2026,
+                        recipients: adminId,
+                        subject: "New Custom Record Created",
+                        body: "Hello admin new custom record has been created"
+                    });
                 }
                     
-                
             }catch(e){
                 log.error("Not worked",e.message);
             }

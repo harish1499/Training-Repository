@@ -2,12 +2,13 @@
  * @NApiVersion 2.1
  * @NScriptType Suitelet
  */
-define(['N/record', 'N/ui/serverWidget'],
+define(['N/record', 'N/ui/serverWidget', 'N/render'],
     /**
  * @param{record} record
  * @param{serverWidget} serverWidget
+ * @param{render} render
  */
-    (record, serverWidget) => {
+    (record, serverWidget, render) => {
         /**
          * Defines the Suitelet script trigger point.
          * @param {Object} scriptContext
@@ -74,7 +75,7 @@ define(['N/record', 'N/ui/serverWidget'],
                         id: 'custpage_jj_ai_transaction_currency',
                         type: serverWidget.FieldType.SELECT,
                         label: "Transaction Currency: ",
-                        source: 'currency'
+                        source: 'customlist_jj_transaction_currency'
                     });
 
                     form.addField({

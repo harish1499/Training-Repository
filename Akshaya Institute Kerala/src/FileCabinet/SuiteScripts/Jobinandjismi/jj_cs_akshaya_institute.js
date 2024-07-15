@@ -3,14 +3,14 @@
  * @NScriptType ClientScript
  * @NModuleScope SameAccount
  */
-define(['N/record', 'N/search', 'N/currency', 'N/http'],
+define(['N/record', 'N/search', 'N/currency', 'N/https'],
 /**
  * @param{record} record
  * @param{search} search
  * @param{currency} currency
- * @param{http} http
+ * @param{http} https
  */
-function(record, search, currency, http) {
+function(record, search, currency, https) {
 
     /**
      * Function to be executed when field is changed.
@@ -27,6 +27,10 @@ function(record, search, currency, http) {
         try{
             let currentRec = scriptContext.currentRecord;
             let fieldId = scriptContext.fieldId;
+
+            let internalId = currentRec.id;
+            console.log("Internal Id : ",internalId);
+
             if(fieldId === 'custpage_jj_ai_language'){
                 let languageId = currentRec.getValue('custpage_jj_ai_language');
                 console.log("language ID is : ",languageId);
@@ -40,49 +44,44 @@ function(record, search, currency, http) {
                 let languageFee = feeRecord.custrecord_jj_language_fee;
                 console.log("fee is ", languageFee);
                 currentRec.setValue({fieldId: 'custpage_jj_ai_fee_amount', value: languageFee});
-
-                //Linking the suitelet 
-                document.location = url.resolveScript({
-                    scriptId : 'customscript_jj_sl_akshaya_institute',
-                    deploymentId : 'customdeploy_jj_sl_akshaya_institute',
-                    params: {
-                        'language_fee':languageFee
-                    }
-                });
-
-                console.log("Run through document.loc");
-
             };
 
             if(fieldId === 'custpage_jj_ai_transaction_currency'){
-                let currency = currentRec.getValue('custpage_jj_ai_transaction_currency');
-                console.log("Currency is : ",currency);
+                let transactionCurrency = currentRec.getText('custpage_jj_ai_transaction_currency');
+                console.log("Currency is : ",transactionCurrency);
+
+                let langueeFeeValue = currentRec.getValue('custpage_jj_ai_fee_amount');
+                console.log("Language fee is : ",langueeFeeValue);
+
+                let exchangeRateValue = exchangeRate(transactionCurrency);
+                console.log("Exchange value is :",exchangeRateValue);
+
+                let payable = langueeFeeValue * exchangeRateValue;
+                console.log("Final payable is : ",payable)
+
+                let finalExchangeRate = currentRec.setValue({
+                    fieldId: 'custpage_jj_ai_exchange_rate',
+                    value: payable
+                });
 
                 //Fetching exchange rate from API endpoint
+                function exchangeRate(transactionCurrency){
+                    let headerObj = {
+                        'Content-Type': 'application/json'
+                    };
+                    
+                    let response = https.get({
+                        url: 'https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_5jMszTbsSSfJRUMCzOlKbeE6isIYrMSDT9ri8f2F&currencies=EUR%2CUSD&base_currency=INR',
+                        header: headerObj
+                    });
+                    console.log("Response is :",response);
 
-                // function requestSend() {
-                //     let endPointUrl = "https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_5jMszTbsSSfJRUMCzOlKbeE6isIYrMSDT9ri8f2F&currencies=USD%2CEUR&base_currency=INR"
-                //     let urlLink = http.get({
-                //         url: endPointUrl
-                //     });
-                //     let json = JSON.parse(urlLink);
-                //     let data = json['data']
+                    let jsonValues = JSON.parse(response.body);
+                    let exchangeRate = jsonValues.data[transactionCurrency];
 
-                //     return data;
-                // }
-                // let exchangeRate = currentRec.setValue({fieldId : 'custpage_jj_ai_exchange_rate', value: requestSend()});
-                
-
-                //Exchange rate
-                let baseCurrencyAmount = languageFee;
-                let rate = currency.exchangeRate({
-                    source: 'IND',
-                    target: 'USD',
-                });
-                let exchange = baseCurrencyAmount * rate;
-                
-                let exchangeRate = currentRec.setValue({fieldId : 'custpage_jj_ai_exchange_rate', value: exchange});
-                console.log("Exchange rate is : ",exchangeRate);
+                    // console.log("Exchange rate is : ",exchangeRate);
+                    return exchangeRate;
+                }
             };
         }catch(e){
             log.error("Script error ",e.message);
