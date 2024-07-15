@@ -2,13 +2,14 @@
  * @NApiVersion 2.1
  * @NScriptType Restlet
  */
-define(['N/record','N/render', 'N/file'],
+define(['N/record','N/render', 'N/file', 'N/url'],
     /**
  * @param{record} record
  * @param{render} render
  * @param{file} file
+ * @param{url} url
  */
-    (record, render, file) => {
+    (record, render, file, url) => {
         /**
          * Defines the function that is executed when a GET request is sent to a RESTlet.
          * @param {Object} requestParams - Parameters from HTTP request URL; parameters passed as an Object (for all supported
@@ -27,31 +28,29 @@ define(['N/record','N/render', 'N/file'],
                 printMode : render.PrintMode.PDF
             });
 
-            //Converting the PDF into the link
+            //Create PDF file
+            let pdfFile = file.create({
+                name: 'Custom Record_'+documentNumber+'_.pdf',
+                fileType: file.Type.PDF,
+                folder: 613,
+                contents: recordPdf.getContents()
+            });
             
+            //Saving the PDF
+            let pdfId = pdfFile.save();
+            log.debug("pdfFile is : ",pdfFile)
+            log.debug("PDF id is : ",pdfId);
+            
+            //Converting the PDF into the link
+            let pdfLoad = file.load({id:pdfId});
 
+            let pdfLink = 'https://system.netsuite.com' + pdfLoad.url;
+            log.debug("PDF Link is : ",pdfLink);
 
-            // let fileTemplate = file.load({id: documentNumber})
-            // Create PDF
-            // let render = render.create();
-            // render.templateContent = templateFile.getContents();
-            // render.addRecord('record', customRecord);
-
-            // let pdfFile = render.renderAsPdf();
-            // pdfFile.name = 'CustomRecord_' + recordId + '.pdf';
-            // pdfFile.folder = 613;
-            // let pdfFileId = pdfFile.save();
-
-            // // Create the URL for the PDF file
-            // let pdfUrl = url.resolveRecord({
-            //     recordType: 'file',
-            //     recordId: pdfFileId,
-            // });
-
-            log.debug("PDF attachment",recordPdf);
-            return recordPdf;
+            return pdfLink;
 
         }
+
 
         /**
          * Defines the function that is executed when a PUT request is sent to a RESTlet.
