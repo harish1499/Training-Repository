@@ -27,6 +27,10 @@ define(['N/record','N/render', 'N/file'],
                 printMode : render.PrintMode.PDF
             });
 
+            //Converting the PDF into the link
+            
+
+
             // let fileTemplate = file.load({id: documentNumber})
             // Create PDF
             // let render = render.create();

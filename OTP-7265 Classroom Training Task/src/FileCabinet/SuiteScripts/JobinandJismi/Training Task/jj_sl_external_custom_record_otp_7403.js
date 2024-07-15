@@ -147,9 +147,11 @@ define(['N/email', 'N/record', 'N/runtime', 'N/search', 'N/ui/serverWidget'],
                         log.debug("Email is available in customer record : ",email);
                         let customerId = runSearch[0].getValue('internalid');
                         log.debug("Customer Id is: ",customerId);
+                        customerSalesRepEmail(customerId);
                         return customerId; 
                     } 
                 }
+
                 function sendEmailToAdmin(adminId){
                     email.send({
                         author: 2026,
@@ -158,7 +160,28 @@ define(['N/email', 'N/record', 'N/runtime', 'N/search', 'N/ui/serverWidget'],
                         body: "Hello admin new custom record has been created"
                     });
                 }
-                    
+
+                function customerSalesRepEmail(customerId){
+                    let customerRec = search.lookupFields({
+                        type: search.Type.CUSTOMER,
+                        id: customerId,
+                        columns: ['salesrep']
+                    });
+                    let salesRepId = customerRec.salesrep[0].value;
+                    if(salesRepId){
+                        log.debug("Sales Rep is : ",salesRepId);
+                        email.send({
+                            author: -5,
+                            recipients: salesRepId,
+                            subject: "Hi Sales rep new custom record has been created",
+                            body: "New customer record has been created under your customer email address"
+                        });
+                    }
+                    else{
+                        log.debug("Sales rep not present");
+                        return '';
+                    }
+                }                   
             }catch(e){
                 log.error("Not worked",e.message);
             }
